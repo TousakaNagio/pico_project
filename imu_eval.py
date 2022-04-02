@@ -3,10 +3,12 @@ from PiicoDev_MPU6050 import PiicoDev_MPU6050
 from PiicoDev_Unified import sleep_ms # Cross-platform compatible sleep function
 from machine import Pin
 
-motion = PiicoDev_MPU6050(bus = 0, freq = 400000, sda = Pin(8), scl = Pin(9))
-
+motion = PiicoDev_MPU6050(bus = 0, freq = 100000, sda = Pin(8), scl = Pin(9))
+count = 0
 while True:
-    
+    count += 1
+    if count > 200:
+        break
     # Accelerometer data
     accel = motion.read_accel_data() # read the accelerometer [ms^-2]
     aX = accel["x"]
