@@ -21,7 +21,8 @@ class BLDC:
             chrust = int(duty*65025/100)
             print(chrust)
             self.pwm.duty_u16(chrust)
-            utime.sleep(5)
+            utime.sleep(0.1)
+            pass
 #             print("start")
 #             for i in range(self.step):
 #                 print(self.MIN + self.turn*i)
@@ -34,5 +35,11 @@ class BLDC:
         
     def zero(self):
         self.pwm.duty_u16(self.MIN)
-    
-
+        
+    def update(self, duty = 5.5):
+#         while True:
+        chrust = int(duty*65025/100)
+        print(chrust)
+        self.pwm.duty_u16(chrust)
+        utime.sleep(0.1)
+        return duty

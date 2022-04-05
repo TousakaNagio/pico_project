@@ -3,6 +3,7 @@ import utime, time
 from servo import Servo
 from servo2 import Servo2
 from bldc import BLDC
+from PID import PID
         
     
 def init():
@@ -28,8 +29,14 @@ def start():
 def main():
     
     init()
-    start()
-#     fan.test_mode()
+    setpoint = 5.8
+    pid = PID(0.9, 0.1, 0.05, setpoint=setpoint)
+#     fan.turn()
+#     start()
+    v = fan.update()
+    while True:
+        control = pid(v)
+        v = fan.update(control)
     #while True:
         #led.toggle()
         #time.sleep_ms(1000)
