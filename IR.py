@@ -29,20 +29,21 @@ class IRs:
         for i in self.sensors:
             value.append(i.value())
         return value
+#         return self.value
     
-def orient(front, back):
-    pass
-    
-
-
-def main():
-    #switch = Pin(0, Pin.IN, Pin.PULL_DOWN)
-    #sensor = Pin(15, Pin.IN, Pin.PULL_DOWN)
-    test = IRs()
-    
-    while True:
-        print(test.values())
-        #print(sensor.value())
-        utime.sleep(0.05)
-        
-main()
+# def orient(front, back):
+#     pass
+#     
+# 
+# 
+# def main():
+#     #switch = Pin(0, Pin.IN, Pin.PULL_DOWN)
+#     #sensor = Pin(15, Pin.IN, Pin.PULL_DOWN)
+#     test = IRs()
+#     
+#     while True:
+#         print(test.values())
+#         #print(sensor.value())
+#         utime.sleep(0.05)
+#         
+# main()
