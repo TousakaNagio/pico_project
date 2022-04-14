@@ -12,7 +12,7 @@ class Servo2:
         self.MAX = 8200
         self.turn = (self.MAX - self.MIN)//self.step
         self.CUR = (self.MIN+self.MAX)//2
-        self.ang = 100
+        self.ang = 95
         
     
     def test_mode(self):
@@ -33,15 +33,15 @@ class Servo2:
             self.pwm.duty_u16(self.CUR)
             utime.sleep(0.5)
     
-    def update(self, ang=90):
+    def update(self, ang=95):
         self.ang = float(ang)
         self.CUR = int(self.ang/180*(self.MAX-self.MIN) + self.MIN)
         self.pwm.duty_u16(self.CUR)
     
     def zero(self):
-        self.ang = 100
+        self.ang = 95
         self.update(self.ang)
-        utime.sleep(0.5)
+        utime.sleep(0.01)
     
     def target(self, tar):
         
@@ -63,33 +63,33 @@ class Servo2:
             self.pwm.duty_u16(int(self.CUR))
             utime.sleep(0.005)
             
-    def turn_right(self):
-        self.ang += 25
+    def turn_right(self, ang = 25):
+        self.ang += ang
         self.update(self.ang)
         utime.sleep(0.001)
         
-    def turn_left(self):
-        self.ang -= 25
+    def turn_left(self, ang = 25):
+        self.ang -= ang
         self.update(self.ang)
         utime.sleep(0.001)
     
     def right(self, add = 15):
-        self.ang = 100 + add
+        self.ang = 95 + add
         self.update(self.ang)
         utime.sleep(0.001)
         
     def left(self, add = 15):
-        self.ang = 100 - add
+        self.ang = 95 - add
         self.update(self.ang)
         utime.sleep(0.001)
         
-    def brake(self, ang = 150):
+    def brake(self, ang = 55):
         self.ang = ang
         self.update(self.ang)
         utime.sleep(0.005)
-    
-    def release(self):
-        self.ang = 90
+        
+    def release(self, ang = 90):
+        self.ang = ang
         self.update(self.ang)
         utime.sleep(0.005)
 
