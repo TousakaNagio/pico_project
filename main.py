@@ -1,12 +1,9 @@
 from machine import Pin, PWM
 import utime, time
-from servo import Servo
 from servo2 import Servo2
 from bldc import BLDC
-from PID import PID
 from photo import Photo
 from IR import IRs
-from track import track
         
     
 def init():
@@ -18,15 +15,16 @@ def init():
     photo = Photo(pin = 2)
     
     global fan
-    fan = BLDC(pin = 10)
+    fan = BLDC(pin = 16)
     
     global normal_speed, climbing_speed, low_speed, falling_speed
     normal_speed = 5.70
-    climbing_speed = 5.885
+    climbing_speed = 5.90
     low_speed = 5.65
     falling_speed = 5.77
+    
     global start_turn_distance, turn_left_distance, mid_turn_distance, end_turn_distance, falling_distance
-    start_turn_distance = 180
+    start_turn_distance = 180 #180
     turn_left_distance = 530
     mid_turn_distance = 200
     end_turn_distance = 500
@@ -49,7 +47,7 @@ def init():
     
     global IR_front, IR_back
     IR_front = IRs(pin1 = 11, pin2 = 12, pin3 = 13, pin4 = 14, pin5 = 15) #will change
-    IR_back = IRs(pin1 = 22, pin2 = 20, pin3 = 23, pin4 = 21, pin5 = 25)
+    IR_back = IRs(pin1 = 22, pin2 = 20, pin3 = 19, pin4 = 21, pin5 = 25)
     
     
 
@@ -80,7 +78,7 @@ def main():
     print('Stage 2')
     fan.update(low_speed)
     for i in range(1):
-        steering.turn_left()
+        steering.turn_left(ang = 20)
     photo.zero()
     while True:
         d = photo.count_distance()
@@ -100,9 +98,6 @@ def main():
             print('Not found')
         else:
             print('Start tracking 1')
-            print('Debug 1')
-            print('Debug 1')
-            print('Debug 1')
             break
     steering.zero()
     
@@ -124,11 +119,11 @@ def main():
         dt = time.time() - timer
         if dt >= 2:
             fan.update(climbing_speed)
-        utime.sleep(0.001)
+        utime.sleep(0.005)
         
         IR_f = IR_front.values()
         
-        if sum(IR_f) >= 4:
+        if sum(IR_f) >= 3:
             utime.sleep(0.25)
             print('pass first line')
             break
@@ -213,34 +208,23 @@ def main():
         utime.sleep(0.05)
         IR_f = IR_front.values()
         IR_b = IR_back.values()
-        
         d = photo.count_distance()
-        utime.sleep(0.005)
         print(d)
+        
         if sum(IR_f) >= 3:
             count_f += 1
-        if sum(IR_b) >= 2:
+        if IR_b[1] == 1 and IR_b[3] == 1:
             count_b += 1
-        if count_b >= 2:
             utime.sleep(0.5)
+#         if sum(IR_b) == 2:
+#             count_b += 1
+#             utime.sleep(0.5)
+        if count_b >= 2:
             break
-#         if count_f >1 or count_b>1:
-#             if sum(IR_f) >= 3 or sum(IR_b) >= 2:
-#                 utime.sleep(0.1)
-#                 break
-#             
-#         if d >= end_turn_distance:
-#             break
-        
-#         if sum(IR_f) >= 4:
-#             utime.sleep(1.5)
-#             print('pass third line')
-#             fan.update(normal_speed)
-#             brake.brake()
-#             break
         
         if IR_f[2] == 1 :
-            utime.sleep(0.001)
+            steering.zero()
+#             utime.sleep(0.001)
             continue
         
         if IR_f[3] == 1 :
@@ -253,12 +237,10 @@ def main():
         
         if IR_f[4] == 1 :
             steering.right(15)
-#             steering.right()
             continue
         
         if IR_f[0] == 1 :
             steering.left(15)
-#             steering.left()
             continue
     
     
@@ -280,28 +262,13 @@ def main():
     count_b = 0
     timer = time.time()
     while True:
-        dt = time.time() - timer
-        utime.sleep(0.04)
+        utime.sleep(0.03) #0.05
         IR_f = IR_front.values()
         IR_b = IR_back.values()
         d = photo.count_distance()
-        utime.sleep(0.005)
         print(d)
-        if IR_f[1] + IR_f[3] == 2:
-            count_f += 1
-            continue
-        if sum(IR_b) >= 2:
-            count_b += 1
-            continue
-        if count_f>=2 and count_b>=3:
-            brake_r.brake(ang = r_ang)
-            brake_l.brake(ang = l_ang)
-            utime.sleep(1)
-            steering.zero()
-            brake_r.release(ang = r_rel)
-            brake_l.release()
-            break
-        if count_f >= 3 or dt >= 10:
+
+        if (d > 250 and sum(IR_f) >= 2) or dt > 7:
             brake_r.brake(ang = r_ang)
             brake_l.brake(ang = l_ang)
             utime.sleep(0.5)
@@ -309,12 +276,18 @@ def main():
             brake_r.release(ang = r_rel)
             brake_l.release()
             break
+        
+        if IR_b[2] == 1:
+            steering.zero()
+            continue
         if IR_f[2] == 1:
             steering.zero()
+            continue
+        
         if IR_f[0] == 1:
             steering.left(add = 10)
         if IR_f[4] == 1:
-            steering.right(add = 15)
+            steering.right(add = 10)
         if IR_f[1] == 1:
             steering.left(add = 5)
         if IR_f[3] == 1:
@@ -323,7 +296,9 @@ def main():
             steering.right(add = 10)
         if IR_b[3] == 1:
             steering.left(add = 5)
-            
+        if IR_b[3] == 1 and IR_b[1] == 1:
+            steering.zero()
+        
     
     # final stage
     print('final stage')
@@ -341,3 +316,4 @@ def main():
 
      
 main()
+
